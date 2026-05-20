@@ -1,5 +1,29 @@
 # Release Notes - DocRivet
 
+## Version 3.5.0
+**Release Date:** 2026-05-20
+**Status:** Latest Stable
+**Editions:** Standard (free) + Premium (license key)
+
+### ✨ Premium Feature Gating & UI Polish
+
+#### Premium Gating — Redact & Search
+- Redact tab now shows a **PRO chip** in the tab header for non-premium users; all palette tools (Select, Rectangle, Mark Text, Eraser) are disabled
+- Search tab entry, navigation buttons, and Mark All are disabled for non-premium users
+- Canvas drawing is blocked for non-premium users — no accidental redaction rectangles can be drawn
+
+#### Theme Consistency Fixes
+- Redact tab preview canvas background now correctly follows the active theme (cool grey `surface_2`), matching the Files tab
+- "FILES WITH MARKS" scroll panel in the Redact tab no longer retains the previous theme's background color after a theme switch
+- Search tab match list panel has the same fix — no stale background after Parchment ↔ Slate switch
+
+#### UI Cleanup
+- PRO chip removed from the status bar (bottom-right) — the title bar PRO button already signals premium status
+- Search tab PRO chip suppressed for premium users; sub-text updated from "Premium" to "0 results" when premium is active
+- Redact tab PRO chip suppressed for premium users
+
+---
+
 ## Version 3.4.1
 **Release Date:** 2026-05-20
 **Status:** Latest Stable
