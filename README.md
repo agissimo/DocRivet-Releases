@@ -1,76 +1,61 @@
-# DocRivet
+# Release Notes - DocRivet
 
-**PDF merge, redaction, and search — built for professionals.**
+## Version 3.4.1
+**Release Date:** 2026-05-20
+**Status:** Latest Stable
+**Editions:** Standard (free) + Premium (license key)
 
-DocRivet assembles multi-source PDF packages — redacted, normalized, and OCR-searchable — in a single offline session. No files leave the machine at any point.
+### 🔧 Bug Fixes
 
----
+#### OCR-on-Add — Duplicate File Deduplication
+Folders containing a mix of original PDFs and their previously OCR'd copies (`_ocr_YYYY-MM-DD_HH-MM.pdf`) could result in multiple variants of the same source appearing in the file list simultaneously. This was visible when re-adding a folder after OCR-on-add had already run, or when opening a project that had accumulated several OCR passes.
 
-## Download
+- **Batch dedup** — when a folder add (or project load) delivers both `foo.pdf` and one or more `foo_ocr_….pdf` files in the same batch, only the preferred variant is kept: the most-recent `_ocr_` copy when OCR mode is on; the original when OCR mode is off
+- **OCR fast-path** — if a fresh `_ocr_` sibling (< 24 h) already exists on disk for a source file, it is added directly instead of re-running Tesseract; applies to both interactive adds and folder adds
+- **No redundant writes** — `_ocr_and_add` re-checks for an existing sibling at worker-thread start before writing a new timestamped copy; concurrent jobs that finish while another is queued no longer produce a second file
+- **Project load dedup** — `_load_project` filters the `source_files` list before adding to the UI, keeping only the most-recent `_ocr_` copy per source stem+directory pair
+- **Ingest guard** — a secondary per-stem filter in `add_files` and `_accept_bg_batch` catches any `_ocr_` copies whose source is already present in the current project list
 
-**[DocRivet-v3.3.0.exe](https://docrivet.com/download)** — Windows standalone, no install required. Double-click and run.
-
-> Standard edition is free. Premium features (OCR, Search & Redact, Stamp/Watermark, Audit Log) require a license key.
-
----
-
-## What it does
-
-| Feature | Standard | Premium |
-|---|:---:|:---:|
-| Merge PDFs & images (JPG, PNG, TIFF, GIF, WebP…) | ✓ | ✓ |
-| Folder import, drag-and-drop | ✓ | ✓ |
-| Per-source page selection | ✓ | ✓ |
-| Manual redaction — draw rectangles, forensic burn-in | ✓ | ✓ |
-| Project save / load (.docrivet) | ✓ | ✓ |
-| Password-protected PDFs | ✓ | ✓ |
-| OCR — searchable text layer (offline, 18 languages) | — | ✓ |
-| OCR on Add — text layer ready before merge | — | ✓ |
-| Search & auto-redact across all files | — | ✓ |
-| Redaction audit log + CSV export | — | ✓ |
-| Reason codes (HIPAA, FOIA, ACP…) | — | ✓ |
-| Stamp / watermark overlay | — | ✓ |
-| Custom output page size (A4 / Letter / Legal) | — | ✓ |
+No source files are modified. No on-disk OCR copies are deleted. Dedup is purely a display/ingest concern.
 
 ---
 
-## Screenshots
+## Version 3.4.0
+**Release Date:** 2026-05-17
+**Status:** Latest Stable
+**Editions:** Standard (free) + Premium (license key)
 
-| Files | Redact | Search |
-|---|---|---|
-| ![Files tab](screenshots/01%20DocRivet-FilesPage.png) | ![Redact tab](screenshots/02%20DocRivet-Redact.png) | ![Search tab](screenshots/03%20DocRivet-Search.png) |
+### ✨ New Features
 
-| Output | Audit Log |
-|---|---|
-| ![Output tab](screenshots/04%20DocRivet-Output.png) | ![Audit log](screenshots/06%20DocRivet-AuditLog.png) |
+#### PDF Split & Extract (Files Tab)
+- **Extract Pages** — select any PDF in the file list and click the new crop icon to extract chosen pages into a new PDF file
+- **Split into Pages** — click the layers icon to write one PDF per page (or custom ranges) into a chosen output folder
+- New `pdf_split_service` backs both operations with the same atomic-write + cancel/progress protocol used by the merge engine
+- Split/Extract toolbar buttons enable only when a PDF is selected; disabled for images
+- Both operations offer a progress bar, cancellable mid-run, and a status message in the main window
+- Extracted files can optionally be added back to the file list immediately after creation
+
+#### Compress Output PDF ★ Premium
+- New **"Compress output PDF"** checkbox in the Output tab → PDF Tools section
+- Applies maximum fitz deflate compression (`garbage=4, deflate, deflate_images, deflate_fonts`) to the merged output as a post-merge step
+- Falls back to a `-compressed` sibling file if the original is locked by a viewer
+- Setting persisted to `.docrivet` preferences across sessions
+
+#### OCR Concurrency — Semaphore-Throttled
+- OCR-on-add now runs through a module-level semaphore (max 2 concurrent Tesseract jobs) to prevent CPU thrash on multi-file drops
+- Live status updates: "OCR 2/5: filename.pdf…" and "OCR: 3 files remaining…" appear in the main window status bar
+- PDFs are fast-checked on the main thread (first-page text scan) before deciding whether to queue OCR, eliminating unnecessary background jobs for PDFs that already have a text layer
+
+### 🔧 Improvements
+
+- **Toolbar tooltips** — all Files-tab toolbar buttons now show hover tooltips via `_bind_tooltip`
+- **theme.py lazy CTk import** — `customtkinter` is no longer imported at module level in `theme.py`; deferred to first use to speed up cold-start and allow headless test imports
+- **Cleaner threading imports** — `threading` imported once at the top of `files_tab.py`; removed stale per-call `import threading as _threading`
+- **atoms.py style cleanup** — multi-statement lines split for readability; no behaviour change
+- **`_pdf_needs_ocr_fast` helper** — checks only page 1 for a text layer; fast enough for the main thread; false negatives (text on later pages only) are acceptable
+
+### 🧪 Tests
+
+- New `tests/test_pdf_split_service.py` covering `extract_pages`, `split_to_pages`, and `compress_pdf`
 
 ---
-
-## Quick start
-
-See [QUICKSTART.md](QUICKSTART.md) for a 5-minute walkthrough.
-
-## Release notes
-
-See [RELEASE_NOTES.md](RELEASE_NOTES.md) for what's in v3.3.0.
-
----
-
-## Requirements
-
-- Windows 10 / 11 (64-bit)
-- No Python, no install, no admin rights required
-
-## License & pricing
-
-- **Standard** — free, no key needed
-- **Premium** — one-time license key; [get a key at docrivet.com](https://docrivet.com)
-
-## Support
-
-- Issues and bug reports: [github.com/agissimo/DocRivet/issues](https://github.com/agissimo/DocRivet/issues)
-- Website: [docrivet.com](https://docrivet.com)
-
----
-
-*DocRivet by [agissimo](https://agissimo.com)*
