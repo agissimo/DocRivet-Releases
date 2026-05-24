@@ -1,6 +1,6 @@
 # DocRivet — Quick Start Guide
 
-**Version 3.2.0**
+**Version 3.6.0**
 
 Get up and running in 5 minutes.
 
@@ -13,8 +13,9 @@ Get up and running in 5 minutes.
 3. [Extract & Combine Pages](#workflow-2-extract--combine-pages)
 4. [Add Scanned Images](#workflow-3-add-scanned-images-to-pdf)
 5. [Redact Sensitive Content](#workflow-4-redact-sensitive-content--visual-walk-through)
-6. [Search & Redact](#workflow-5-search--redact-premium) ★ Premium
-7. [OCR Searchable Output](#workflow-6-ocr-searchable-output-premium) ★ Premium
+6. [PII Auto-Redact](#workflow-5-pii-auto-redact-premium) ★ Premium
+7. [Search & Redact](#workflow-6-search--redact-premium) ★ Premium
+8. [OCR Searchable Output](#workflow-7-ocr-searchable-output-premium) ★ Premium
 
 ---
 
@@ -24,21 +25,23 @@ Get up and running in 5 minutes.
 |---------|----------|---------|
 | Merge PDFs & images | ✓ | ✓ |
 | Page selection | ✓ | ✓ |
+| PDF Split & Extract | ✓ | ✓ |
 | Manual redaction (draw) | ✓ | ✓ |
 | Project save / load | ✓ | ✓ |
+| PII auto-redact (regex scan) | — | ✓ |
 | OCR searchable layer | — | ✓ |
 | Search & auto-redact | — | ✓ |
 | Redaction audit log | — | ✓ |
 
-Check your edition: **Help → About**.  
-Upgrade or enter a key: **Help → Enter License Key…**
+Check your edition: **Help → About**.
+Upgrade or enter a key: click the **PRO** badge in the title bar.
 
 ---
 
 ## Installation
 
 ### Windows (standalone)
-Double-click `DocRivet.exe` — no setup needed.
+Double-click `DocRivet-v3.6.0.exe` — no setup needed.
 
 ### From Python source
 ```
@@ -69,7 +72,7 @@ DocRivet is a 4-tab workspace:
 | Tab | What you do there |
 |-----|-------------------|
 | **Files** | Add, reorder, and preview source files |
-| **Redact** | Draw redaction rectangles on any page |
+| **Redact** | Draw redaction rectangles or run a PII auto-scan |
 | **Search** ★ | Find text across all files; mark matches for redaction |
 | **Output** | Set destination, options (OCR, clean metadata), and merge |
 
@@ -79,7 +82,7 @@ DocRivet is a 4-tab workspace:
 - **PRO** pill — shows your edition; click to manage license
 - **Merge ▶** — always visible; kicks off the merge from any tab
 
-**Font zoom**: Ctrl+  /  Ctrl−  /  Ctrl+0 (75 %–200 %, persisted across sessions)
+**Font zoom**: Ctrl+  /  Ctrl−  /  Ctrl+0 (75%–200%, persisted across sessions)
 
 ---
 
@@ -121,84 +124,77 @@ Redaction permanently destroys content at the PDF content-stream level. Source f
 ├───────────────┼─────────────────────────┼──────────────┤
 │ ▶ report.pdf  │   REPORT Q4 2024        │ (empty)      │
 │   invoice.pdf │                         │              │
-│   budget.pdf  │   Revenue: $5,240,000   │              │
+│               │   Revenue: $5,240,000   │              │
 │               │   Margin:  18.5%        │              │
 │               │   Client:  Acme Corp    │              │
-│               │                         │              │
-│               │  Hint: click-drag to    │              │
-│               │  redact. Right-click    │              │
-│               │  to clear page.         │              │
 └───────────────┴─────────────────────────┴──────────────┘
-Status: Ready to redact — report.pdf, Page 1/3
 ```
 
-Click a file in the left panel. The preview loads on the right. Navigate pages with ◄ ►.
+The palette is in **MANUAL** mode by default. Click a file in the left panel. Navigate pages with ◄ ►.
 
 ### Step 2 — Draw a rectangle (mouse down + drag)
 
-```
-│               │   Revenue: $5,240,000   │
-│               │   ┌ ╌ ╌ ╌ ╌ ╌ ╌ ╌ ┐    │  ← dashed red
-│               │   ╌  Margin: 18.5% ╌    │    rubber-band
-│               │   └ ╌ ╌ ╌ ╌ ╌ ╌ ╌ ┘    │
-│               │   Client:  Acme Corp    │
-```
+A live dashed outline follows your mouse. Release to commit. The rectangle turns solid black — that region will be permanently destroyed in the merged output.
 
-A live dashed outline follows your mouse. Release to commit.
+### Step 3 — Merge burns them in permanently
 
-### Step 3 — Rectangle commits (solid black bar)
-
-```
-│               │   Revenue: $5,240,000   │
-│               │   ┌─────────────────┐   │
-│               │   │█████████████████│   │  ← permanent in output
-│               │   │█████████████████│   │
-│               │   └─────────────────┘   │
-│               │   Client:  Acme Corp    │
-│               │                         │
-│               │  1 redaction this page  │
-```
-
-Draw again to add more. Right-click the preview → **Clear redactions on this page** to undo all marks on the current page.
-
-### Step 4 — Redactions persist as you navigate
-
-Switch pages or files freely. Each page remembers its own set of redaction marks. The audit log panel (Premium) records every action with timestamp and reason code.
-
-### Step 5 — Merge burns them in permanently
-
-Go to the **Output** tab. The review card shows total redaction count across all files. Click **Merge ▶**. The output dialog confirms:
-
-```
-Redactions applied (securely burned):
-• report.pdf, page 1: 2 regions  (Margin, Client)
-• invoice.pdf, page 2: 1 region  (Amount)
-
-These regions are permanently destroyed and unrecoverable.
-Content-stream redaction with garbage collection (level 4).
-```
+Go to the **Output** tab → **Merge ▶**. The output dialog confirms which regions were applied.
 
 **Key rules**
 - Right-click the preview → **Clear page** removes all marks on that page only
-- A page can be deselected from merge and still have marks; they are simply skipped
 - Marks are saved in `.docrivet` project files and survive close/reopen
 
 ---
 
-## Workflow 5: Search & Redact ★ Premium
+## Workflow 5: PII Auto-Redact ★ Premium
+
+Automatically find SSNs, credit card numbers, IBANs, SINs, phone numbers, and 20+ other patterns across all loaded files, review each hit, and commit approved ones in one click.
+
+### Step 1 — Switch to AUTO mode
+
+In the Redact tab, click the **AUTO** toggle at the top of the palette (next to MANUAL).
+
+### Step 2 — Select patterns
+
+Check the jurisdictions and pattern categories you want to scan for. US, CA, and Universal are available in V1. Selections persist across MANUAL/AUTO toggles within the session.
+
+### Step 3 — Scan
+
+Click **Scan**. A background thread processes all loaded files; per-file progress shows in the status bar. Click **Cancel** at any time to stop.
+
+### Step 4 — Review matches
+
+Each match appears as a row: category chip · matched text · filename + page. Click any row to jump to that location in the preview. Staged matches show as orange dashed outlines on the canvas.
+
+### Step 5 — Select and commit
+
+Check or uncheck individual matches. Use **Mark All** / **Clear All** for bulk selection. Click **Commit** — approved rects are written to the redaction layer, the audit log is updated, and the palette returns to MANUAL mode.
+
+### Step 6 — Merge
+
+**Merge ▶** burns all committed PII redactions into the output, alongside any manual marks.
+
+**Tips**
+- Re-scanning the same files is safe — duplicate marks and audit entries are never created
+- Date of Birth is opt-in (unchecked by default) — high false-positive risk on non-PHI dates
+- Committed marks are solid red; pending (staged) marks are orange dashed
+
+---
+
+## Workflow 6: Search & Redact ★ Premium
 
 Find every occurrence of a term across all loaded files and redact them all in one step.
 
-1. Go to the **Search** tab → type a term (e.g. `SSN`, `CONFIDENTIAL`)
+1. Go to the **Search** tab (tab 3) → type a term (e.g. `CONFIDENTIAL`, `Acme Corp`)
 2. Click **Search** — all matches highlight in the preview; use ↑ ↓ to step through them
 3. Click **Mark All for Redact** to queue every match as a redaction region
 4. **Merge ▶** — every occurrence is burned out of the output
 
-Tip: works on text-layer PDFs. For scanned sources, enable OCR first (see Workflow 6).
+Tip: works on text-layer PDFs. For scanned sources, enable OCR first (see Workflow 7).
 
 ---
 
-## Workflow 6: OCR Searchable Output ★ Premium
+## Workflow 7: OCR Searchable Output ★ Premium
 
 Turn a scan-only PDF into one you can search and copy text from.
 
@@ -217,7 +213,6 @@ Optional: check **OCR on add** to process each file as it's added to the list, s
 | Drag rows in Files tab | Reorder merge order |
 | **Select All / None / Invert** | Bulk check state |
 | **Remove** / Delete key | Remove file from list |
-| **Show full path** toggle | Filename-only vs. full path in the list |
 | **Clean metadata** (Output tab) | Strip author/title/creator from output (default ON) |
 | **Open after merge** | Auto-open output PDF when done |
 
@@ -247,12 +242,12 @@ Optional: check **OCR on add** to process each file as it's added to the list, s
 - [ ] **Output path** set (Output tab → Browse)
 - [ ] Encrypted PDFs: **passwords entered**
 - [ ] Page selections: **at least one page per file**
-- [ ] Sensitive regions: **redacted** (manual or Search & Redact)
+- [ ] Sensitive regions: **redacted** (manual draw or PII auto-redact or Search & Redact)
 
 ---
 
 ## Need More Help?
 
-- **Full User Guide**: [docrivet.com](https://docrivet.com)
-- **What's New**: [RELEASE_NOTES.md](RELEASE_NOTES.md)
-- **Issues / Feedback**: https://github.com/agissimo/DocRivet/issues
+- **Full release notes**: [RELEASE_NOTES.md](RELEASE_NOTES.md)
+- **Website**: https://docrivet.com
+- **Issues / Feedback**: https://github.com/agissimo/DocRivet-Releases/issues

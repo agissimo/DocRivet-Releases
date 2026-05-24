@@ -1,61 +1,103 @@
-# Release Notes - DocRivet
+# DocRivet
 
-## Version 3.4.1
-**Release Date:** 2026-05-20
-**Status:** Latest Stable
-**Editions:** Standard (free) + Premium (license key)
+**Assemble, redact, and publish multi-source PDF packages — entirely offline.**
 
-### 🔧 Bug Fixes
-
-#### OCR-on-Add — Duplicate File Deduplication
-Folders containing a mix of original PDFs and their previously OCR'd copies (`_ocr_YYYY-MM-DD_HH-MM.pdf`) could result in multiple variants of the same source appearing in the file list simultaneously. This was visible when re-adding a folder after OCR-on-add had already run, or when opening a project that had accumulated several OCR passes.
-
-- **Batch dedup** — when a folder add (or project load) delivers both `foo.pdf` and one or more `foo_ocr_….pdf` files in the same batch, only the preferred variant is kept: the most-recent `_ocr_` copy when OCR mode is on; the original when OCR mode is off
-- **OCR fast-path** — if a fresh `_ocr_` sibling (< 24 h) already exists on disk for a source file, it is added directly instead of re-running Tesseract; applies to both interactive adds and folder adds
-- **No redundant writes** — `_ocr_and_add` re-checks for an existing sibling at worker-thread start before writing a new timestamped copy; concurrent jobs that finish while another is queued no longer produce a second file
-- **Project load dedup** — `_load_project` filters the `source_files` list before adding to the UI, keeping only the most-recent `_ocr_` copy per source stem+directory pair
-- **Ingest guard** — a secondary per-stem filter in `add_files` and `_accept_bg_batch` catches any `_ocr_` copies whose source is already present in the current project list
-
-No source files are modified. No on-disk OCR copies are deleted. Dedup is purely a display/ingest concern.
+No cloud upload. No subscription required. No installer — just run the EXE.
 
 ---
 
-## Version 3.4.0
-**Release Date:** 2026-05-17
-**Status:** Latest Stable
-**Editions:** Standard (free) + Premium (license key)
+## Download
 
-### ✨ New Features
+| Version | File | Size |
+|---------|------|------|
+| **3.6.0** (latest) | [DocRivet-v3.6.0.exe](DocRivet-v3.6.0.exe) | 60.6 MB |
+| 3.5.0 | [DocRivet-v3.5.0.exe](DocRivet-v3.5.0.exe) | — |
+| 3.4.1 | [DocRivet-v3.4.1.exe](DocRivet-v3.4.1.exe) | — |
+| 3.4.0 | [DocRivet-v3.4.0.exe](DocRivet-v3.4.0.exe) | — |
 
-#### PDF Split & Extract (Files Tab)
-- **Extract Pages** — select any PDF in the file list and click the new crop icon to extract chosen pages into a new PDF file
-- **Split into Pages** — click the layers icon to write one PDF per page (or custom ranges) into a chosen output folder
-- New `pdf_split_service` backs both operations with the same atomic-write + cancel/progress protocol used by the merge engine
-- Split/Extract toolbar buttons enable only when a PDF is selected; disabled for images
-- Both operations offer a progress bar, cancellable mid-run, and a status message in the main window
-- Extracted files can optionally be added back to the file list immediately after creation
-
-#### Compress Output PDF ★ Premium
-- New **"Compress output PDF"** checkbox in the Output tab → PDF Tools section
-- Applies maximum fitz deflate compression (`garbage=4, deflate, deflate_images, deflate_fonts`) to the merged output as a post-merge step
-- Falls back to a `-compressed` sibling file if the original is locked by a viewer
-- Setting persisted to `.docrivet` preferences across sessions
-
-#### OCR Concurrency — Semaphore-Throttled
-- OCR-on-add now runs through a module-level semaphore (max 2 concurrent Tesseract jobs) to prevent CPU thrash on multi-file drops
-- Live status updates: "OCR 2/5: filename.pdf…" and "OCR: 3 files remaining…" appear in the main window status bar
-- PDFs are fast-checked on the main thread (first-page text scan) before deciding whether to queue OCR, eliminating unnecessary background jobs for PDFs that already have a text layer
-
-### 🔧 Improvements
-
-- **Toolbar tooltips** — all Files-tab toolbar buttons now show hover tooltips via `_bind_tooltip`
-- **theme.py lazy CTk import** — `customtkinter` is no longer imported at module level in `theme.py`; deferred to first use to speed up cold-start and allow headless test imports
-- **Cleaner threading imports** — `threading` imported once at the top of `files_tab.py`; removed stale per-call `import threading as _threading`
-- **atoms.py style cleanup** — multi-statement lines split for readability; no behaviour change
-- **`_pdf_needs_ocr_fast` helper** — checks only page 1 for a text layer; fast enough for the main thread; false negatives (text on later pages only) are acceptable
-
-### 🧪 Tests
-
-- New `tests/test_pdf_split_service.py` covering `extract_pages`, `split_to_pages`, and `compress_pdf`
+Windows 10/11 · No installer · No admin rights required
 
 ---
+
+## What It Does
+
+DocRivet takes any mix of PDFs, scanned images, and office documents and merges them into a single output file — redacted, normalized, OCR-searchable, and PII-scanned — without any file leaving your machine.
+
+### Document Assembly (Standard — free)
+- Merge any number of PDFs and images into one output file
+- Import JPG, PNG, TIFF (multi-page), GIF, WebP, BMP — converted to PDF pages automatically
+- Recursive folder import; drag-and-drop from Explorer
+- Per-source page selection — pick individual pages or ranges from each file
+- Reorder sources by drag or Alt+↑ / Alt+↓
+- Password-protected PDF support
+- PDF Split & Extract — extract pages or split into one-per-page files
+- Project save / load (`.docrivet` files) — resume any session exactly where you left off
+
+### Premium Features (license key)
+- **PII Auto-Redact** — scan all loaded files for SSNs, credit cards, IBANs, SINs, phone numbers, and 20+ other patterns; review each match; commit approved ones to the redaction layer in one click. All local, pure regex, no ML.
+- **Manual Redaction** — draw rectangles over any sensitive region; forensically burned into the merged output at the PDF content-stream level; source files never modified
+- **Search & Redact** — full-text search across all files; mark all matches for redaction in one step
+- **OCR Searchable Layer** — Tesseract bundled; 18 languages; invisible text layer added to scanned pages
+- **Redaction Audit Log** — every redaction logged (file, page, coordinates, reason code, timestamp); CSV exported with each merge
+- **Reason Codes** — FOIA Exemption, HIPAA PHI, Attorney-Client Privilege, and more
+- **Stamp / Watermark** — CONFIDENTIAL, project name, date, page numbers; footer / header / diagonal
+- **Compress Output** — maximum PDF deflate compression as a post-merge step
+- **Page Normalization** — unify mixed page sizes to A4, Letter, or Legal
+
+---
+
+## Screenshots
+
+| Files | Redact | Search | Output |
+|-------|--------|--------|--------|
+| ![Files tab](screenshots/01%20DocRivet-FilesPage.png) | ![Redact tab](screenshots/02%20DocRivet-Redact.png) | ![Search tab](screenshots/03%20DocRivet-Search.png) | ![Output tab](screenshots/04%20DocRivet-Output.png) |
+
+---
+
+## Quick Start
+
+See [QUICKSTART.md](QUICKSTART.md) for step-by-step workflows.
+
+---
+
+## Editions
+
+| Feature | Standard | Premium |
+|---------|----------|---------|
+| Merge PDFs & images | ✓ | ✓ |
+| Page selection & reorder | ✓ | ✓ |
+| PDF Split & Extract | ✓ | ✓ |
+| Project save / load | ✓ | ✓ |
+| Manual redaction (draw) | ✓ | ✓ |
+| PII auto-redact (regex scan) | — | ✓ |
+| Search & auto-redact | — | ✓ |
+| OCR searchable layer (18 languages) | — | ✓ |
+| Redaction audit log + CSV | — | ✓ |
+| Reason codes (FOIA / HIPAA / etc.) | — | ✓ |
+| Stamp / watermark | — | ✓ |
+| Compress output PDF | — | ✓ |
+| Page normalization (A4 / Letter / Legal) | — | ✓ |
+
+To upgrade: click the **PRO** badge in the title bar → enter your license key.
+
+---
+
+## Privacy
+
+- All processing is local — no data ever leaves your machine
+- No internet connection required (Tesseract OCR is bundled in the EXE)
+- License key is stored at `%APPDATA%\DocRivet\license.key` and never transmitted
+- PII scan runs entirely in-process using Python `re` — no cloud API, no ML model
+
+---
+
+## Release Notes
+
+See [RELEASE_NOTES.md](RELEASE_NOTES.md) for the full feature list and version history.
+
+---
+
+## Support
+
+- **Issues / feedback:** https://github.com/agissimo/DocRivet-Releases/issues
+- **Website:** https://docrivet.com
