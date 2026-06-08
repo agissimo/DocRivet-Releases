@@ -1,6 +1,6 @@
 # DocRivet — Quick Start Guide
 
-**Version 3.6.0**
+**Version 3.9.5**
 
 Get up and running in 5 minutes.
 
@@ -41,7 +41,7 @@ Upgrade or enter a key: click the **PRO** badge in the title bar.
 ## Installation
 
 ### Windows (standalone)
-Double-click `DocRivet-v3.6.0.exe` — no setup needed.
+Double-click `DocRivet-v3.9.0.exe` — no setup needed.
 
 ### From Python source
 ```

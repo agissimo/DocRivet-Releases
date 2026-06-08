@@ -1,7 +1,7 @@
 # Release Notes — DocRivet
 
-## Version 3.6.0 — Full Release Notes
-**Release Date:** 2026-05-22
+## Version 3.9.0 — Full Feature List
+**Release Date:** 2026-05-27
 **Editions:** Standard (free) · Premium (license key)
 **Platform:** Windows 10/11 · Single self-contained EXE (no installer, no admin rights)
 
@@ -173,6 +173,18 @@ Re-scanning and re-committing the same file never creates duplicate redaction ma
 ---
 
 ## Version History
+
+### 3.9.5 (2026-06-07)
+Memory & resource leak hardening: search UI lock-up fix (missing `as exc` left `_searching=True` permanently after any search error); Leptonica thread-safety fix (search path now acquires `_leptonica_lock` before calling `get_textpage_ocr()`); merge worker no longer crashes on app-close mid-merge; fitz document handles wrapped in `try/finally` throughout OCR and normalize paths; pixmaps explicitly released after `tobytes()` (up to ~89 MB saved at max zoom); `_meta_cache` now evicted on file removal. No new user-visible features. 564 tests.
+
+### 3.9.0 (2026-05-27)
+Redaction integrity fixes: audit log reconciliation on project load (orphaned marks re-added automatically); Search "Mark All for Redact" now immediately updates the Redact tab badge and file list; tab-switch mark refresh; merge progress now reports per-file redaction counts and ends with a counter-validation summary confirming how many marks were applied.
+
+### 3.7.0 (2026-05-26)
+Security hardening: CI security checks (Bandit + pip-audit on every PR); shell injection fix in keygen GUI; explicit SSL context for license time checks; NTP response validation (length + stratum); silent exception swallowing replaced with logger warnings; project file path validation. 548 tests (up from 475).
+
+### 3.6.0 (2026-05-22)
+PII Pattern Redaction (Premium): MANUAL/AUTO palette toggle; US, CA, Universal pattern library (SSN, SIN, credit card, IBAN, phone, email, 20+ patterns); Luhn/checksum validation; background scan with cancel; staged orange-outline preview; dedup commit to redaction layer; 475 tests.
 
 ### 3.5.0 (2026-05-20)
 Premium feature gating (PRO chip in Redact & Search tabs for non-premium users); theme consistency fixes; UI cleanup.

@@ -10,10 +10,10 @@ No cloud upload. No subscription required. No installer — just run the EXE.
 
 | Version | File | Size |
 |---------|------|------|
-| **3.6.0** (latest) | [DocRivet-v3.6.0.exe](DocRivet-v3.6.0.exe) | 60.6 MB |
-| 3.5.0 | [DocRivet-v3.5.0.exe](DocRivet-v3.5.0.exe) | — |
-| 3.4.1 | [DocRivet-v3.4.1.exe](DocRivet-v3.4.1.exe) | — |
-| 3.4.0 | [DocRivet-v3.4.0.exe](DocRivet-v3.4.0.exe) | — |
+| **3.9.5** (latest) | [DocRivet-v3.9.5.exe](DocRivet-v3.9.5.exe) | 60.6 MB |
+| 3.9.0 | [DocRivet-v3.9.0.exe](DocRivet-v3.9.0.exe) | 60.5 MB |
+| 3.7.0 | [DocRivet-v3.7.0.exe](DocRivet-v3.7.0.exe) | 60.6 MB |
+| 3.6.0 | [DocRivet-v3.6.0.exe](DocRivet-v3.6.0.exe) | 60.6 MB |
 
 Windows 10/11 · No installer · No admin rights required
 
